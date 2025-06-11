@@ -3,67 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Bi-directional Translator</title>
+    <title>Nautical Text Translator</title>
     <!-- Link to our external stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
-        
-        <!-- Our Custom Translator Controls -->
-        <div class="translator-controls">
-            <div class="language-picker">
-                <label for="source-language-selector">Translate From:</label>
-                <select id="source-language-selector">
-                    <option value="en" selected>English</option>
-                    <option value="ar">Arabic</option>
-                </select>
-            </div>
-            
-            <div class="language-picker">
-                <label for="target-language-selector">Translate To:</label>
-                <select id="target-language-selector">
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
-                    <option value="ja">Japanese</option>
-                    <option value="ar">Arabic</option>
-                    <option value="ru">Russian</option>
-                    <option value="en">English</option>
-                </select>
+        <header>
+            <h1><span class="icon">⚓</span> Nautical Text Translator</h1>
+        </header>
+
+        <main>
+            <!-- Language Selection Controls -->
+            <div class="language-controls">
+                <div class="language-picker">
+                    <label for="source-language-selector">From</label>
+                    <select id="source-language-selector">
+                        <option value="en" selected>English</option>
+                        <option value="ar">Arabic</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                    </select>
+                </div>
+
+                <button id="swap-btn" class="icon-btn" title="Swap Languages">↔</button>
+
+                <div class="language-picker">
+                    <label for="target-language-selector">To</label>
+                    <select id="target-language-selector">
+                        <option value="ar">Arabic</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ru">Russian</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="buttons-container">
-                <button id="translate-btn" class="translate-btn">Translate</button>
-                <button id="reset-btn" class="translate-btn">Reset</button>
+            <!-- Input and Output Text Areas -->
+            <div class="translator-io-panel">
+                <div class="io-box">
+                    <textarea id="input-text" placeholder="Enter text to translate..."></textarea>
+                    <!-- This is a trick: the label is styled as a button, which triggers the hidden file input -->
+                    <label for="file-input" class="btn file-btn">Import from .txt File</label>
+                    <input type="file" id="file-input" accept=".txt" hidden>
+                </div>
+                <div class="io-box">
+                    <textarea id="output-text" placeholder="Translation will appear here..." readonly></textarea>
+                </div>
             </div>
             
+            <!-- Main Action Buttons -->
+            <div class="action-buttons">
+                <button id="translate-btn" class="btn primary-btn">Translate</button>
+                <button id="clear-btn" class="btn secondary-btn">Clear</button>
+            </div>
+
             <div id="status-message"></div>
-        </div>
-
-        <!-- The Content We Want to Translate -->
-        <div id="content-area">
-
-            <!-- English Content Block (Visible by default) -->
-            <div id="english-content">
-                <h1>Welcome to Our Custom-Built Translator!</h1>
-                <p>This is a demonstration of a translator built from scratch. You can now select both the <strong>source</strong> and <strong>target</strong> language.</p>
-                <p>To test Arabic to English translation, select "Arabic" from the "Translate From" dropdown. The text will change to Arabic, and you can then translate it to English or any other language.</p>
-            </div>
-
-            <!-- Arabic Content Block (Hidden by default) -->
-            <div id="arabic-content" style="display: none;" dir="rtl">
-                <h1>!مرحبًا بك في المترجم المخصص لدينا</h1>
-                <p>هذا عرض توضيحي لمترجم تم إنشاؤه من البداية. يمكنك الآن اختيار كل من اللغة <strong>المصدر</strong> واللغة <strong>الهدف</strong></p>
-                <p>لاختبار الترجمة من العربية إلى الإنجليزية، حدد "الإنجليزية" من القائمة المنسدلة "ترجمة إلى". يمكنك بعد ذلك ترجمة هذا النص إلى اللغة الإنجليزية أو أي لغة أخرى</p>
-            </div>
-        </div>
-
+        </main>
     </div>
 
-    <!-- Link to our external JavaScript file -->
-    <script src="script.js"></script>
+    <!-- Link to our external JavaScript file (deferred for faster page load) -->
+    <script src="script.js" defer></script>
 
 </body>
 </html>
