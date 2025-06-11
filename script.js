@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const translateBtn = document.getElementById('translate-btn');
     const clearBtn = document.getElementById('clear-btn');
+    const copyBtn = document.getElementById('copy-btn');
     
     const statusMessage = document.getElementById('status-message');
 
@@ -19,9 +20,28 @@ document.addEventListener('DOMContentLoaded', () => {
     clearBtn.addEventListener('click', handleClear);
     swapBtn.addEventListener('click', handleSwap);
     fileInput.addEventListener('change', handleFileImport);
+    copyBtn.addEventListener('click', handleCopy);
 
     /**
-     * Swaps the selected source and target languages.
+     * Copies the content of the output text area to the clipboard.
+     */
+    function handleCopy() {
+        const textToCopy = outputText.value;
+        if (!textToCopy) {
+            statusMessage.textContent = "Nothing to copy.";
+            return;
+        }
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            statusMessage.textContent = "Copied to clipboard!";
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            statusMessage.textContent = "Could not copy text.";
+        });
+    }
+
+    /**
+     * Swaps the selected source and target languages and the text content.
      */
     function handleSwap() {
         const sourceVal = sourceLangSelector.value;
@@ -30,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sourceLangSelector.value = targetVal;
         targetLangSelector.value = sourceVal;
 
-        // Also swap the text in the input/output boxes
         const inputVal = inputText.value;
         const outputVal = outputText.value;
         inputText.value = outputVal;
@@ -47,13 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Reads a text file selected by the user and places its content in the input box.
+     * Reads a text file and places its content in the input box.
      */
     function handleFileImport(event) {
         const file = event.target.files[0];
-        if (!file) {
-            return;
-        }
+        if (!file) return;
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -67,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     /**
-     * Main function to handle the translation process via API call.
+     * Main function to trigger the translation process.
      */
     async function handleTranslation() {
         const textToTranslate = inputText.value.trim();
@@ -87,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         statusMessage.textContent = "Translating...";
         translateBtn.disabled = true;
+        outputText.value = ''; // Clear previous output
 
         try {
             const translatedText = await translateText(textToTranslate, sourceLang, targetLang);
@@ -94,36 +112,57 @@ document.addEventListener('DOMContentLoaded', () => {
             statusMessage.textContent = "Translation complete!";
         } catch (error) {
             console.error("Translation failed:", error);
-            statusMessage.textContent = "Error: Could not complete translation.";
+            // Provide a more specific error message if the API gives one
+            statusMessage.textContent = `Error: ${error.message}`;
         } finally {
-            translateBtn.disabled = false; // Re-enable button regardless of outcome
+            translateBtn.disabled = false; // Re-enable button
         }
     }
 
     /**
-     * Calls the MyMemory API to translate a single piece of text.
+     * Calls the MyMemory API and robustly handles the response.
      * @param {string} text - The text to translate.
-     * @param {string} sourceLang - The source language code (e.g., 'en').
-     * @param {string} targetLang - The target language code (e.g., 'es').
+     * @param {string} sourceLang - The source language code.
+     * @param {string} targetLang - The target language code.
      * @returns {Promise<string>} - A promise that resolves with the translated text.
      */
     async function translateText(text, sourceLang, targetLang) {
         const encodedText = encodeURIComponent(text);
-        const apiUrl = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=${sourceLang}|${targetLang}`;
-
+        // Added a fake email to comply with API usage recommendations for higher limits
+        const apiUrl = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=${sourceLang}|${targetLang}&de=youremail@example.com`;
+        
+        console.log("Calling API:", apiUrl); // For debugging
+        
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
+            throw new Error(`Network error (status ${response.status}). Please try again later.`);
         }
 
         const data = await response.json();
-        if (data.responseStatus !== 200) {
-            throw new Error(`API returned an error: ${data.responseDetails}`);
+        console.log("API Response:", data); // For debugging
+
+        // **THIS IS THE CRITICAL FIX**
+        // We now safely check if the expected data exists before trying to use it.
+        if (data.responseData && data.responseData.translatedText) {
+            // The API sometimes returns HTML entities (like ' for '). This decodes them.
+            return decodeHtmlEntities(data.responseData.translatedText);
+        } else if (data.responseStatus === 429) {
+            throw new Error("API rate limit exceeded. Please wait a moment.");
+        } else if (data.responseDetails) {
+            throw new Error(`API Error: ${data.responseDetails}`);
+        } else {
+            throw new Error("Could not find a valid translation in the API response.");
         }
-        
-        // Decode HTML entities (like ' for ') for a cleaner output
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = data.responseData.translatedText;
-        return tempDiv.textContent || tempDiv.innerText || "";
+    }
+
+    /**
+     * A helper function to decode HTML entities (e.g., ' becomes ').
+     * @param {string} text - The text with HTML entities.
+     * @returns {string} - The decoded text.
+     */
+    function decodeHtmlEntities(text) {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = text;
+        return textarea.value;
     }
 });
