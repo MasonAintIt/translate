@@ -1,98 +1,202 @@
-/* --- Basic Styling --- */
+/* Using CSS variables for an easy-to-manage theme */
+:root {
+    --navy-dark: #0A192F;    /* Deep sea blue */
+    --navy-light: #172a45;   /* Lighter container background */
+    --slate-blue: #3A506B;   /* Text area and select background */
+    --off-white: #CCD6F6;    /* Main text color */
+    --accent-gold: #FFC947;  /* Buttons and highlights */
+    --accent-gold-darker: #e6b540; /* Button hover */
+    --border-radius: 12px;   /* Consistent rounded corners */
+}
+
+/* --- General Body & Background Styling --- */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f7f7f7;
-    color: #333;
-}
-
-.container {
-    max-width: 800px;
-    margin: auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-h1 {
-    color: #0056b3;
-}
-
-/* --- Translator Controls Styling --- */
-.translator-controls {
+    background-color: var(--navy-dark);
+    color: var(--off-white);
     display: flex;
-    flex-direction: column; /* Stack controls vertically */
-    gap: 20px; /* space between elements */
-    padding: 20px;
-    background-color: #eef;
-    border: 1px solid #cce;
-    border-radius: 8px;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+/* --- Main Container --- */
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--navy-light);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--slate-blue);
+    padding: 20px 30px;
+}
+
+header h1 {
+    text-align: center;
+    color: var(--accent-gold);
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* --- Controls for Language Selection --- */
+.language-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
 }
 
 .language-picker {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
 }
 
 .language-picker label {
-    font-weight: bold;
-    color: #333;
+    font-size: 0.9em;
+    color: var(--off-white);
+    opacity: 0.8;
 }
 
 select {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--slate-blue);
+    color: var(--off-white);
+    border: 1px solid var(--navy-dark);
+    border-radius: 8px;
     font-size: 16px;
-    flex-grow: 1; /* Allows select to grow and fill space */
-}
-
-.buttons-container {
-    display: flex;
-    gap: 15px;
-}
-
-.translate-btn {
-    padding: 10px 22px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-.translate-btn:hover {
-    background-color: #0056b3;
+.icon-btn {
+    background: none;
+    border: 1px solid var(--slate-blue);
+    color: var(--accent-gold);
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin: 0 20px;
+    margin-top: 20px; /* Aligns with select boxes */
+    transition: background-color 0.2s, transform 0.2s;
+}
+.icon-btn:hover {
+    background-color: var(--slate-blue);
+    transform: scale(1.1);
 }
 
-#reset-btn {
-    background-color: #6c757d;
+/* --- Input/Output Panel --- */
+.translator-io-panel {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-#reset-btn:hover {
-    background-color: #5a6268;
+.io-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
+textarea {
+    width: 100%;
+    height: 250px;
+    padding: 15px;
+    background-color: var(--navy-dark);
+    color: var(--off-white);
+    border: 1px solid var(--slate-blue);
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    resize: vertical;
+    box-sizing: border-box; /* Important for consistent sizing */
+}
+textarea::placeholder {
+    color: var(--off-white);
+    opacity: 0.5;
+}
+
+/* --- Buttons --- */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.btn:active {
+    transform: translateY(1px);
+}
+
+.primary-btn {
+    background-color: var(--accent-gold);
+    color: var(--navy-dark);
+}
+.primary-btn:hover {
+    background-color: var(--accent-gold-darker);
+}
+
+.secondary-btn {
+    background-color: var(--slate-blue);
+    color: var(--off-white);
+}
+.secondary-btn:hover {
+    background-color: #4a6582; /* Slightly lighter slate */
+}
+
+.file-btn {
+    margin-top: 10px;
+    text-align: center;
+    background-color: var(--slate-blue);
+    color: var(--off-white);
+}
+.file-btn:hover {
+    background-color: #4a6582;
+}
+
+
+/* --- Status Message --- */
 #status-message {
+    text-align: center;
+    min-height: 1.2em;
+    color: var(--accent-gold);
     font-style: italic;
-    color: #555;
-    min-height: 1em; /* Prevents layout shift when text appears */
 }
 
-/* --- Content Styling --- */
-#content-area {
-    border-top: 1px solid #eee;
-    padding-top: 20px;
-}
-
-/* Style for Right-to-Left text like Arabic */
-#arabic-content {
-    text-align: right;
+/* --- Responsive Design for smaller screens --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .translator-io-panel {
+        flex-direction: column;
+    }
+    .language-controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .icon-btn {
+        margin-top: 0;
+        transform: rotate(90deg); /* Better for vertical layout */
+    }
 }
