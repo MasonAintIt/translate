@@ -1,0 +1,98 @@
+/* --- Basic Styling --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f7f7f7;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+h1 {
+    color: #0056b3;
+}
+
+/* --- Translator Controls Styling --- */
+.translator-controls {
+    display: flex;
+    flex-direction: column; /* Stack controls vertically */
+    gap: 20px; /* space between elements */
+    padding: 20px;
+    background-color: #eef;
+    border: 1px solid #cce;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.language-picker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.language-picker label {
+    font-weight: bold;
+    color: #333;
+}
+
+select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    flex-grow: 1; /* Allows select to grow and fill space */
+}
+
+.buttons-container {
+    display: flex;
+    gap: 15px;
+}
+
+.translate-btn {
+    padding: 10px 22px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.translate-btn:hover {
+    background-color: #0056b3;
+}
+
+#reset-btn {
+    background-color: #6c757d;
+}
+
+#reset-btn:hover {
+    background-color: #5a6268;
+}
+
+#status-message {
+    font-style: italic;
+    color: #555;
+    min-height: 1em; /* Prevents layout shift when text appears */
+}
+
+/* --- Content Styling --- */
+#content-area {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+/* Style for Right-to-Left text like Arabic */
+#arabic-content {
+    text-align: right;
+}
