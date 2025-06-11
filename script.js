@@ -87,11 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
      * Main function to trigger the translation process.
      */
     async function handleTranslation() {
-        const textToTranslate = inputText.value.trim();
+        const textToTranslate = inputText.value; // Don't trim yet, preserve newlines
         const sourceLang = sourceLangSelector.value;
         const targetLang = targetLangSelector.value;
 
-        if (!textToTranslate) {
+        if (!textToTranslate.trim()) {
             statusMessage.textContent = "Please enter some text to translate.";
             return;
         }
@@ -102,17 +102,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        statusMessage.textContent = "Translating...";
+        statusMessage.textContent = "Processing... Preparing to translate.";
         translateBtn.disabled = true;
         outputText.value = ''; // Clear previous output
 
         try {
-            const translatedText = await translateText(textToTranslate, sourceLang, targetLang);
-            outputText.value = translatedText;
+            // Split the text into lines and translate them in parallel
+            const lines = textToTranslate.split('\n');
+            statusMessage.textContent = `Translating ${lines.length} lines...`;
+
+            // Create an array of promises, one for each line
+            const translationPromises = lines.map(line => {
+                // If a line is just whitespace, don't call the API for it
+                if (line.trim() === '') {
+                    return Promise.resolve(line);
+                }
+                return translateText(line, sourceLang, targetLang);
+            });
+            
+            // Wait for all the translation promises to complete
+            const translatedLines = await Promise.all(translationPromises);
+            
+            // Join the translated lines back together
+            outputText.value = translatedLines.join('\n');
             statusMessage.textContent = "Translation complete!";
+
         } catch (error) {
             console.error("Translation failed:", error);
-            // Provide a more specific error message if the API gives one
             statusMessage.textContent = `Error: ${error.message}`;
         } finally {
             translateBtn.disabled = false; // Re-enable button
@@ -120,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Calls the MyMemory API and robustly handles the response.
+     * Calls the MyMemory API for a SINGLE line of text.
      * @param {string} text - The text to translate.
      * @param {string} sourceLang - The source language code.
      * @param {string} targetLang - The target language code.
@@ -128,37 +144,27 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function translateText(text, sourceLang, targetLang) {
         const encodedText = encodeURIComponent(text);
-        // Added a fake email to comply with API usage recommendations for higher limits
         const apiUrl = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=${sourceLang}|${targetLang}&de=youremail@example.com`;
-        
-        console.log("Calling API:", apiUrl); // For debugging
         
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error(`Network error (status ${response.status}). Please try again later.`);
+            throw new Error(`Network error (status ${response.status}).`);
         }
 
         const data = await response.json();
-        console.log("API Response:", data); // For debugging
-
-        // **THIS IS THE CRITICAL FIX**
-        // We now safely check if the expected data exists before trying to use it.
+        
         if (data.responseData && data.responseData.translatedText) {
-            // The API sometimes returns HTML entities (like ' for '). This decodes them.
             return decodeHtmlEntities(data.responseData.translatedText);
         } else if (data.responseStatus === 429) {
             throw new Error("API rate limit exceeded. Please wait a moment.");
-        } else if (data.responseDetails) {
-            throw new Error(`API Error: ${data.responseDetails}`);
         } else {
-            throw new Error("Could not find a valid translation in the API response.");
+            // If API can't translate a specific line (e.g., it's just code), return the original line
+            return text;
         }
     }
 
     /**
      * A helper function to decode HTML entities (e.g., ' becomes ').
-     * @param {string} text - The text with HTML entities.
-     * @returns {string} - The decoded text.
      */
     function decodeHtmlEntities(text) {
         const textarea = document.createElement('textarea');
